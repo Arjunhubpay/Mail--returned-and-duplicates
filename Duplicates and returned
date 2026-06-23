@@ -1,7 +1,6 @@
 /**
  * PayOps Email Monitor — Claude Code Routine
  * Schedule: Every 1 hour, 9:00 AM to 6:30 PM UAE, Monday to Friday
- * Triggers to create: 9AM, 10AM, 11AM, 12PM, 1PM, 2PM, 3PM, 4PM, 5PM, 6PM, 6:30PM GMT+4
  */
 
 const ROUTINE_PROMPT = `
@@ -10,7 +9,7 @@ If today is Saturday or Sunday → STOP immediately. Do not run any checks. Do n
 
 If weekday, run the following checks.
 
-## CHECK 1 — Corpay: Funds Returned / Rejected
+## CHECK 1 — Corpay (emeaclientsupport@corpay.com)
 Search Outlook for emails FROM emeaclientsupport@corpay.com received in the last 1 hour.
 
 Filter — only keep emails where subject OR body contains any of:
@@ -19,24 +18,36 @@ Filter — only keep emails where subject OR body contains any of:
 - "placed into your holding balance" / "holding balance"
 - "recall could not take place" / "funds rejected"
 - "returned to your" / "please advise on how you would like us to proceed"
+- "request to reverse" / "reverse unidentified funds"
+- "reversal" / "payment reversal"
+- "return of funds" / "return to originating" / "return to sender"
+- "funds have been declared null and void"
+- "proof of return"
+- "unidentified funds"
 
 ---
 
-## CHECK 2 — Zand: Duplicate Payment Release
+## CHECK 2 — Zand (customerservice@zand.ae)
 Search Outlook for emails FROM customerservice@zand.ae received in the last 1 hour.
 
 Filter — only keep emails where subject OR body contains any of:
-- "release" and "duplicate"
-- "possible duplicate queue"
-- "confirm if we can release"
-- "duplicate queue at the bank"
+- "possible duplicate" / "duplicate queue"
+- "confirm if we can release" / "release the below"
+- "request to reverse" / "reverse unidentified funds"
+- "return of funds" / "return to originating" / "return to sender"
+- "reversal" / "payment reversal"
+- "unidentified funds"
+- "funds returned" / "rejected"
 
 ---
 
-## CHECK 3 — Hubpay reply check (apply to both checks above)
+## CHECK 3 — Hubpay reply check (apply to BOTH checks above)
 For each matching email, check if the conversation thread has a reply FROM any of:
-- arjun.krishnan@hubpay.ae, mohsin.mohammed@hubpay.ae, kiran.shahzadi@hubpay.ae
-- payments@hubpay.ae, zeba@hubpay.ae
+- arjun.krishnan@hubpay.ae
+- mohsin.mohammed@hubpay.ae
+- kiran.shahzadi@hubpay.ae
+- payments@hubpay.ae
+- zeba@hubpay.ae
 
 If replied → skip. If no reply → unattended.
 
@@ -57,8 +68,8 @@ _{UAE date & time} | {N} unattended email(s) awaiting response_
 
 | # | From | Subject | Received |
 |---|------|---------|----------|
-| 1 | Corpay | RE: Payment status - AP-XXXX | 18 Jun 2026, 10:15 AM |
-| 2 | Zand | RE: Possible duplicate - XXXX | 18 Jun 2026, 11:30 AM |
+| 1 | Corpay | RE: Request to Reverse Unidentified Funds | 23 Jun, 10:15 AM |
+| 2 | Zand | RE: possible duplicate D780895857089131 | 23 Jun, 11:30 AM |
 
 ⚠️ Kindly check and respond to the above.
 _PayOps Monitor • Every 1hr | 9:00 AM – 6:30 PM UAE | Mon–Fri_

@@ -1,0 +1,83 @@
+/**
+ * PayOps Email Monitor — Claude Code Routine
+ * Schedule: Every 1 hour, 9:00 AM to 6:30 PM UAE, Monday to Friday
+ */
+
+const ROUTINE_PROMPT = `
+You are a PayOps email monitor for Hubpay. First check if today is a weekday (Monday–Friday UAE time).
+If today is Saturday or Sunday → STOP immediately. Do not run any checks. Do not post anything.
+
+If weekday, run the following checks.
+
+## CHECK 1 — Corpay (ALL Corpay senders)
+Search Outlook for emails received in the last 1 hour FROM any of these senders:
+- emeaclientsupport@corpay.com
+- confirmations@cambridgefx.com
+- ukemg@corpay.com
+- OR any email address ending in @corpay.com OR @cambridgefx.com
+
+Filter — only keep emails where subject OR body contains any of:
+- "funds returned" / "funds have been returned"
+- "Funds Returned" (in subject like "Hubpay Ltd - Deal: XXXXX-1 (Funds Returned)")
+- "rejected and returned" / "rejected by the beneficiary" / "rejected by the beneficiary bank"
+- "placed into your holding balance" / "holding balance"
+- "recall could not take place" / "funds rejected"
+- "returned to your" / "please advise on how you would like us to proceed"
+- "request to reverse" / "reverse unidentified funds"
+- "reversal" / "payment reversal"
+- "return of funds" / "return to originating" / "return to sender"
+- "funds have been declared null and void"
+- "proof of return"
+- "unidentified funds"
+
+---
+
+## CHECK 2 — Zand (customerservice@zand.ae)
+Search Outlook for emails FROM customerservice@zand.ae received in the last 1 hour.
+
+Filter — only keep emails where subject OR body contains any of:
+- "possible duplicate" / "duplicate queue"
+- "confirm if we can release" / "release the below"
+- "request to reverse" / "reverse unidentified funds"
+- "return of funds" / "return to originating" / "return to sender"
+- "reversal" / "payment reversal"
+- "unidentified funds"
+- "funds returned" / "rejected"
+
+---
+
+## CHECK 3 — Hubpay reply check (apply to BOTH checks above)
+For each matching email, check if the conversation thread has a reply FROM any of:
+- arjun.krishnan@hubpay.ae
+- mohsin.mohammed@hubpay.ae
+- kiran.shahzadi@hubpay.ae
+- payments@hubpay.ae
+- zeba@hubpay.ae
+
+If replied → skip. If no reply → unattended.
+
+---
+
+## STEP 4 — DECISION (strictly follow this)
+
+Combine all unattended emails from both checks.
+
+IF total count = 0:
+  → STOP. Do NOT use Slack. Do NOT post anything. End silently.
+
+IF total count > 0:
+  → Post to #automation-payops (ID: C0AUYL9CTD3):
+
+🚨 *PayOps — Unattended Emails Requiring Action*
+_{UAE date & time} | {N} unattended email(s) awaiting response_
+
+| # | From | Subject | Received |
+|---|------|---------|----------|
+| 1 | Corpay | Hubpay Ltd - Deal: 42124007-1 (Funds Returned) | 23 Jun, 10:15 AM |
+| 2 | Zand | RE: possible duplicate D780895857089131 | 23 Jun, 11:30 AM |
+
+⚠️ Kindly check and respond to the above.
+_PayOps Monitor • Every 1hr | 9:00 AM – 6:30 PM UAE | Mon–Fri_
+`;
+
+module.exports = { ROUTINE_PROMPT };
